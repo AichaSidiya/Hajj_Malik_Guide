@@ -1610,13 +1610,6 @@ function highlight(text, q) {
   }
 }
 
-function init() {
-  document.getElementById("sectionFilter").innerHTML =
-    '<option value="">كل الأبواب</option>' +
-    SECTIONS.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
-  render();
-}
-
 let activeQuickSections = null;
 
 function setSearch(t) {
