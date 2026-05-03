@@ -1566,7 +1566,11 @@ const QUICK_MAP = {
 };
 const QUICK = Object.keys(QUICK_MAP);
 
+document.getElementById("quickTags").innerHTML =
+  `<span class="tag" onclick="resetAll()">كل المسائل</span>` +
+  QUICK.map(t => `<span class="tag" onclick="setSearch('${esc(t)}')">${esc(t)}</span>`).join("");
 
+  
 function normalize(s) {
   return (s || "").toString().toLowerCase()
     .replace(/[أإآ]/g,"ا")
@@ -1660,7 +1664,6 @@ function render() {
     }).join("");
   }
 }
-
 init();
 </script>
 </body>
