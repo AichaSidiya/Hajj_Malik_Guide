@@ -1601,16 +1601,25 @@ function init() {
   render();
 }
 
+let activeQuickSections = null;
+
 function setSearch(t) {
-  const mapped = QUICK_MAP[t] || t;
-  document.getElementById("q").value = mapped;
+  activeQuickSections = QUICK_MAP[t] || null;
+  document.getElementById("q").value = "";
+  document.getElementById("sectionFilter").value = "";
   render();
 }
 
 function matches(item, q, section) {
   const inSection = !section || item.sections.includes(section);
+
+  const inQuick =
+    !activeQuickSections ||
+    item.sections.some(sec => activeQuickSections.includes(sec));
+
   const hay = normalize(`${item.num} ${item.text} ${item.sections.join(" ")}`);
-  return inSection && (!q || hay.includes(q) || q.split(/\s+/).every(w => hay.includes(w)));
+
+  return inSection && inQuick && (!q || hay.includes(q) || q.split(/\s+/).every(w => hay.includes(w)));
 }
 
 function card(item, qRaw) {
@@ -1622,19 +1631,26 @@ function card(item, qRaw) {
 
 function render() {
   const qRaw = document.getElementById("q").value;
+  if (qRaw) activeQuickSections = null;
+
   const q = normalize(qRaw);
   const section = document.getElementById("sectionFilter").value;
   const filtered = DATA.filter(item => matches(item, q, section));
-  document.getElementById("stats").textContent = `النتائج: ${filtered.length} من أصل ${DATA.length} نقطة`;
+
+  document.getElementById("stats").textContent =
+    `النتائج: ${filtered.length} من أصل ${DATA.length} نقطة`;
 
   const results = document.getElementById("results");
+
   if (!filtered.length) {
-    results.innerHTML = '<div class="empty">لا توجد نتيجة. جرّبي كلمة أخرى أو اختاري كل الأبواب.</div>';
+    results.innerHTML =
+      '<div class="empty">لا توجد نتيجة. جرّبي كلمة أخرى أو اختاري كل الأبواب.</div>';
     return;
   }
 
-  if (q || section) {
-    results.innerHTML = `<div class="grid">${filtered.map(item => card(item, qRaw)).join("")}</div>`;
+  if (q || section || activeQuickSections) {
+    results.innerHTML =
+      `<div class="grid">${filtered.map(item => card(item, qRaw)).join("")}</div>`;
   } else {
     results.innerHTML = SECTIONS.map(sec => {
       const arr = DATA.filter(item => item.sections.includes(sec));
